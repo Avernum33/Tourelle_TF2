@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Relancer Tourelle Kiosque
+Comment=Lance l'interface de controle de la tourelle en mode plein ecran
+Exec=/usr/bin/firefox --kiosk http://127.0.0.1:5001/
+Icon=application-x-executable # Icône par défaut pour les programmes
+Terminal=false
+Type=Application
+Categories=Utility;
