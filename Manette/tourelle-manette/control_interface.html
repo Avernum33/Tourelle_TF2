@@ -38,7 +38,6 @@
             object-fit: cover;
         }
 
-        /* Conteneur UI principal */
         #controls-overlay {
             position: relative; z-index: 20;
             height: 100%; width: 100%;
@@ -50,17 +49,20 @@
 
         /* --- HEADER (BANNIÈRE HAUTE) --- */
         .header-bar {
-            padding: 0.5rem 1rem;
+            padding: 0.2rem 1rem;
             background-color: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #F0C419;
             pointer-events: auto;
+            
+            /* Police globale du header doublée */
+            font-size: 1.8rem; 
+            line-height: 1.2;
         }
         .w-1-3 { width: 33%; }
         
-        /* Conteneur Droite : Texte + Bouton Taunt */
         .header-right-container {
             display: flex;
             align-items: center;
@@ -69,13 +71,25 @@
         }
         .text-right { text-align: right; }
 
-        /* Bouton TAUNT (Carré Jaune) */
+        /* Style spécifique pour le % Batterie GÉANT */
+        #tourelle-battery-percent {
+            font-size: 3.5rem; /* Très gros */
+            line-height: 1;
+            vertical-align: middle;
+            text-shadow: 2px 2px 0 #000;
+        }
+        #tourelle-battery-voltage {
+            font-size: 1.5rem;
+            vertical-align: middle;
+        }
+
+        /* Bouton TAUNT */
         .taunt-btn {
-            width: 40px; height: 40px;
+            width: 50px; height: 50px;
             background-color: #F0C419;
             border: 2px solid #fff;
-            border-radius: 4px;
-            font-size: 1.5rem;
+            border-radius: 6px;
+            font-size: 2rem;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0,0,0,0.5);
@@ -83,14 +97,14 @@
         }
         .taunt-btn:active { transform: scale(0.9); background-color: #d4ac0d; }
 
-        /* --- ZONE CENTRALE (Layout Spacer) --- */
+        /* --- ZONE CENTRALE --- */
         .middle-section {
-            flex-grow: 1;            /* Prend tout l'espace vide */
-            display: flex;           /* Flexbox */
-            flex-direction: row;     
-            align-items: flex-end;   /* Pousse le contenu en BAS */
-            justify-content: space-between; /* GAUCHE <-> DROITE */
-            padding: 0 2rem 1rem 2rem; /* Marges (Bas: 1rem pour ne pas toucher le footer) */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 0 2rem 1rem 2rem;
             pointer-events: none;
         }
 
@@ -104,17 +118,12 @@
         .space-y-4 > * + * { margin-top: 1rem; }
         .space-y-8 > * + * { margin-top: 2rem; }
 
-        .pan-buttons-row {
-            display: flex; flex-direction: row; gap: 2rem;
-        }
-        .tilt-buttons-col {
-            display: flex; flex-direction: column; gap: 2rem;
-        }
+        .pan-buttons-row { display: flex; flex-direction: row; gap: 2rem; }
+        .tilt-buttons-col { display: flex; flex-direction: column; gap: 2rem; }
 
-        /* --- GROS BOUTONS RONDS --- */
+        /* --- BOUTONS --- */
         .control-button {
-            width: 12rem;   /* Taille Large (192px) */
-            height: 12rem;
+            width: 12rem; height: 12rem;
             border-radius: 50%;
             font-size: 4rem;
             display: flex; align-items: center; justify-content: center;
@@ -128,41 +137,39 @@
         }
         .control-button:active { transform: scale(0.95); background-color: #3b5998; }
         
-        /* Bouton Quitter (Rouge Rectangle) */
         .control-button.red {
             background-color: #BA2227;
             border: none;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             width: auto; height: auto;
             border-radius: 0.5rem;
-            padding: 0.75rem 1.5rem;
+            padding: 1rem 2rem;
         }
 
         /* --- FOOTER --- */
         .footer-log {
             padding: 0.5rem;
             background-color: rgba(0, 0, 0, 0.7);
-            font-size: 0.875rem;
+            font-size: 1rem;
             border-top: 2px solid #F0C419;
             width: 100%;
         }
 
-        /* --- OVERLAYS ALERTE --- */
+        /* --- ALERTES --- */
         #low-battery-overlay, #low-ammo-overlay {
             position: absolute; left: 50%; pointer-events: none; z-index: 50; display: none;
             font-weight: bold; animation: pulse 0.5s infinite alternate;
         }
         #low-battery-overlay {
             top: 50%; transform: translate(-50%, -50%);
-            color: #BA2227; font-size: 5rem; text-shadow: 0 0 10px rgba(255, 0, 0, 0.9);
+            color: #BA2227; font-size: 6rem; text-shadow: 0 0 15px rgba(255, 0, 0, 0.9);
         }
         #low-ammo-overlay {
-            top: 90px; transform: translate(-50%, 0);
-            color: #F0C419; font-size: 3rem; text-shadow: 0 0 10px rgba(240, 196, 25, 0.9);
+            top: 120px; transform: translate(-50%, 0);
+            color: #F0C419; font-size: 4rem; text-shadow: 0 0 15px rgba(240, 196, 25, 0.9);
         }
         @keyframes pulse { from { opacity: 0.9; } to { opacity: 1.0; } }
         
-        /* --- MODAL --- */
         .hidden { display: none !important; }
         #confirmation-modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -173,7 +180,7 @@
         .modal-content {
             background-color: #1f2937; padding: 2rem;
             border-radius: 0.5rem; border: 2px solid #F0C419;
-            max-width: 24rem;
+            max-width: 30rem;
         }
     </style>
 </head>
@@ -192,26 +199,32 @@
     <div id="controls-overlay">
         
         <div class="header-bar tf2-font">
-            <div class="w-1-3">
-                <span style="font-size: 1.5em;">🟢</span> MUNITIONS: <span id="munitions-level" class="text-green-400">OK</span>
+            <div class="w-1-3" style="display: flex; align-items: center;">
+                <span style="font-size: 1.2em; margin-right: 10px;">🟢</span> 
+                <span style="margin-right: 10px;">MUNITIONS:</span> 
+                <span id="munitions-level" class="text-green-400">OK</span>
             </div>
+            
             <div>
-                <button id="quit-button" class="control-button red">Quitter Kiosque</button>
+                <button id="quit-button" class="control-button red">Quitter</button>
             </div>
             
             <div class="w-1-3 header-right-container">
                 <div class="text-right">
-                    CONNEXION: <span id="status-connexion" class="text-red-500">HORS LIGNE</span><br>
-                    TOURELLE: <span id="tourelle-battery-percent" class="text-red-500">--%</span> (<span id="tourelle-battery-voltage">--V</span>)
+                    <div style="font-size: 0.6em; margin-bottom: -5px;">CONNEXION: <span id="status-connexion" class="text-red-500">HORS LIGNE</span></div>
+                    <div>
+                        <span id="batterie-tourelle-icon" class="battery-icon" style="font-size: 2rem;">🔌</span>
+                        <span id="tourelle-battery-percent" class="text-red-500">--%</span> 
+                        <span id="tourelle-battery-voltage" style="opacity: 0.8;">(--V)</span>
+                    </div>
                 </div>
-                <button id="taunt-button" class="taunt-btn" title="Jouer Son Troll">📢</button>
+                <button id="taunt-button" class="taunt-btn" title="Taunt">📢</button>
             </div>
         </div>
 
         <div class="middle-section">
-            
             <div class="control-group space-y-4">
-                <h2 class="tf2-font text-yellow-300" style="font-size: 2rem; text-shadow: 2px 2px 0 #000;">PAN</h2>
+                <h2 class="tf2-font text-yellow-300" style="font-size: 2.5rem; text-shadow: 3px 3px 0 #000;">PAN</h2>
                 <div class="pan-buttons-row">
                     <button id="pan-left" data-command="PAN_LEFT" class="control-button">&#9664;</button>
                     <button id="pan-right" data-command="PAN_RIGHT" class="control-button">&#9654;</button>
@@ -219,25 +232,23 @@
             </div>
 
             <div class="control-group space-y-8">
-                <h2 class="tf2-font text-yellow-300" style="font-size: 2rem; text-shadow: 2px 2px 0 #000;">TILT</h2>
+                <h2 class="tf2-font text-yellow-300" style="font-size: 2.5rem; text-shadow: 3px 3px 0 #000;">TILT</h2>
                 <div class="tilt-buttons-col">
                     <button id="tilt-up" data-command="TILT_UP" class="control-button">&#9650;</button>
                     <button id="tilt-down" data-command="TILT_DOWN" class="control-button">&#9660;</button>
                 </div>
             </div>
-
         </div>
 
         <div class="footer-log tf2-outline">
-            <p id="debug-log">Log de Commande: Prêt à envoyer des instructions...</p>
+            <p id="debug-log">Log de Commande: Prêt.</p>
         </div>
-
     </div>
 
     <div id="confirmation-modal" class="hidden">
         <div class="modal-content">
-            <h3 class="tf2-font text-yellow-300" style="font-size: 1.5rem; margin-bottom: 1rem;">CONFIRMATION</h3>
-            <p style="margin-bottom: 1.5rem;">Voulez-vous vraiment quitter l'interface ?</p>
+            <h3 class="tf2-font text-yellow-300" style="font-size: 2rem; margin-bottom: 1rem;">CONFIRMATION</h3>
+            <p style="margin-bottom: 1.5rem; font-size: 1.2rem;">Quitter l'interface ?</p>
             <div style="display: flex; justify-content: space-between;">
                 <button id="modal-cancel" class="control-button red" style="background-color: #4C72B0;">Annuler</button>
                 <button id="modal-confirm" class="control-button red">Confirmer</button>
@@ -246,7 +257,6 @@
     </div>
 
     <script>
-        // --- CONFIGURATION ---
         const LOCAL_MANETTE_IP = '127.0.0.1';
         const LOCAL_MANETTE_PORT = 5001;
         const LOCAL_API_ENDPOINT = `http://${LOCAL_MANETTE_IP}:${LOCAL_MANETTE_PORT}/api/command`; 
@@ -267,7 +277,6 @@
         let currentBatteryPercent = 100;
         let currentAmmoStatus = "OK";
 
-        // --- API CALLS ---
         const sendCommand = async (action) => {
             const debugLog = document.getElementById('debug-log');
             try {
@@ -277,22 +286,18 @@
                     body: JSON.stringify({ action: action })
                 });
                 const result = await response.json();
-                debugLog.textContent = `Log: ${action} > OK. Tourelle: ${result.message || 'Relayé'}`;
+                debugLog.textContent = `Log: ${action} > OK.`;
                 return response.ok;
             } catch (error) {
-                debugLog.textContent = `Erreur: Serveur local non joignable (${action}).`;
+                debugLog.textContent = `Erreur: Serveur local non joignable.`;
                 return false;
             }
         };
         
-        // Joue le son de notification (Batterie/Munitions)
         const playNotificationSound = async () => {
-            try {
-                await fetch(NOTIFICATION_API_ENDPOINT, { method: 'POST' });
-            } catch (e) { console.log("Erreur son notif"); }
+            try { await fetch(NOTIFICATION_API_ENDPOINT, { method: 'POST' }); } catch (e) {}
         };
 
-        // --- HANDLERS MOUVEMENT ---
         const handleContinuousCommand = (command) => {
             if (commandIntervalId) clearInterval(commandIntervalId);
             sendCommand(command);
@@ -311,7 +316,6 @@
             sendCommand(stopCommand);
         };
         
-        // --- LOGIQUE MÉTIER ---
         const convertVoltageToPercent = (voltage) => {
             const V_FULL = 12.6; const V_EMPTY = 10.5; 
             if (voltage >= V_FULL) return 100;
@@ -329,16 +333,15 @@
             const lowAmmoOverlay = document.getElementById('low-ammo-overlay');
 
             if (is_connected) {
-                statusConnexionSpan.textContent = "CONNECTÉ";
+                statusConnexionSpan.textContent = "OK";
                 statusConnexionSpan.className = "text-green-400";
             } else {
-                statusConnexionSpan.textContent = "HORS LIGNE";
+                statusConnexionSpan.textContent = "HS";
                 statusConnexionSpan.className = "text-red-500";
                 tourelleBatteryPercent.textContent = "--%";
-                tourelleBatteryVoltage.textContent = "--V";
+                tourelleBatteryVoltage.textContent = "";
                 munitionsLevel.textContent = "---";
                 
-                // Nettoyage si déconnexion
                 lowBatteryOverlay.style.display = 'none';
                 lowAmmoOverlay.style.display = 'none';
                 if (lowBatteryIntervalId) { clearInterval(lowBatteryIntervalId); lowBatteryIntervalId = null; }
@@ -350,15 +353,13 @@
             const overlay = document.getElementById('low-battery-overlay');
             if (currentBatteryPercent < LOW_BATTERY_THRESHOLD) {
                 if (!lowBatteryIntervalId) {
-                    // Premier déclenchement immédiat
                     overlay.style.display = 'block';
                     playNotificationSound(); 
                     setTimeout(() => { overlay.style.display = 'none'; }, ALERT_DISPLAY_TIME);
 
-                    // Puis boucle
                     lowBatteryIntervalId = setInterval(() => {
                         overlay.style.display = 'block';
-                        playNotificationSound(); // Son à chaque cycle
+                        playNotificationSound();
                         setTimeout(() => { overlay.style.display = 'none'; }, ALERT_DISPLAY_TIME);
                     }, ALERT_CYCLE_TIME);
                 }
@@ -372,15 +373,13 @@
             const overlay = document.getElementById('low-ammo-overlay');
             if (currentAmmoStatus === AMMO_LOW_THRESHOLD) {
                 if (!lowAmmoIntervalId) {
-                    // Premier déclenchement immédiat
                     overlay.style.display = 'block';
                     playNotificationSound();
                     setTimeout(() => { overlay.style.display = 'none'; }, ALERT_DISPLAY_TIME);
 
-                    // Puis boucle
                     lowAmmoIntervalId = setInterval(() => {
                         overlay.style.display = 'block';
-                        playNotificationSound(); // Son à chaque cycle
+                        playNotificationSound();
                         setTimeout(() => { overlay.style.display = 'none'; }, ALERT_DISPLAY_TIME);
                     }, ALERT_CYCLE_TIME);
                 }
@@ -402,23 +401,21 @@
                 currentAmmoStatus = statusData.ammo_status;
                 currentBatteryPercent = convertVoltageToPercent(statusData.voltage);
                 
-                // Mise à jour Affichage Batterie
                 const batElem = document.getElementById('tourelle-battery-percent');
                 batElem.textContent = `${currentBatteryPercent}%`;
-                document.getElementById('tourelle-battery-voltage').textContent = `${statusData.voltage.toFixed(1)}V`;
+                document.getElementById('tourelle-battery-voltage').textContent = `(${statusData.voltage.toFixed(1)}V)`;
+                
                 batElem.className = currentBatteryPercent < 20 ? "text-red-500" : (currentBatteryPercent < 50 ? "text-yellow-300" : "text-green-400");
 
-                // Mise à jour Affichage Munitions
                 const ammoElem = document.getElementById('munitions-level');
                 if (currentAmmoStatus === "AMMO_LOW") {
-                    ammoElem.textContent = "FAIBLE - RECHARGEZ!";
+                    ammoElem.textContent = "VIDE";
                     ammoElem.className = "text-red-500";
                 } else {
                     ammoElem.textContent = "OK";
                     ammoElem.className = "text-green-400";
                 }
 
-                // Vérification des alertes
                 manageLowBatteryWarning();
                 manageLowAmmoWarning();
 
@@ -427,7 +424,6 @@
             }
         };
 
-        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             const quitButton = document.getElementById('quit-button');
             const tauntButton = document.getElementById('taunt-button');
@@ -435,7 +431,6 @@
             const modalConfirm = document.getElementById('modal-confirm');
             const modalCancel = document.getElementById('modal-cancel');
 
-            // Modal Handlers
             quitButton.addEventListener('click', () => modal.classList.remove('hidden'));
             modalCancel.addEventListener('click', () => modal.classList.add('hidden'));
             modalConfirm.addEventListener('click', async () => {
@@ -443,12 +438,10 @@
                 await fetch(KILL_API_ENDPOINT, { method: 'POST' });
             });
 
-            // Taunt Handler
             tauntButton.addEventListener('click', () => {
                 sendCommand('TAUNT');
             });
 
-            // Movement Handlers
             document.querySelectorAll('.control-button').forEach(button => {
                 const command = button.getAttribute('data-command');
                 if (command && (command.startsWith('PAN_') || command.startsWith('TILT_'))) {
@@ -460,7 +453,6 @@
                 }
             });
             
-            // Loop de statut
             updateTourelleStatus(); 
             setInterval(updateTourelleStatus, STATUS_UPDATE_INTERVAL); 
         });
