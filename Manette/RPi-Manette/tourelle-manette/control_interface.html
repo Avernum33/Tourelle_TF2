@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Tourelle Airsoft TF2 - Contrôle Tactile</title>
+    
+    <style>
+        /* --- BASE & RESET --- */
+        * { box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            margin: 0; padding: 0;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+
+        /* --- CLASSES UTILITAIRES TF2 --- */
+        .tf2-red { background-color: #BA2227; }
+        .tf2-blue { background-color: #4C72B0; }
+        .tf2-outline { border: 2px solid #F0C419; }
+        .tf2-font { font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; }
+        .text-yellow-300 { color: #f6e05e; }
+        .text-red-500 { color: #ef4444; }
+        .text-green-400 { color: #4ade80; }
+        .font-bold { font-weight: 700; }
+
+        /* --- LAYOUT PRINCIPAL --- */
+        #video-feed-container {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 10;
+        }
+        #video-stream {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+
+        #controls-overlay {
+            position: relative; z-index: 20;
+            height: 100%; width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        /* --- HEADER (BANNIÈRE HAUTE) --- */
+        .header-bar {
+            padding: 0.2rem 1rem;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #F0C419;
+            pointer-events: auto;
+            
+            /* Police globale du header doublée */
+            font-size: 1.8rem; 
+            line-height: 1.2;
+        }
+        .w-1-3 { width: 33%; }
+        
+        .header-right-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        .text-right { text-align: right; }
+
+        /* Style spécifique pour le % Batterie GÉANT */
+        #tourelle-battery-percent {
+            font-size: 3.5rem; /* Très gros */
+            line-height: 1;
+            vertical-align: middle;
+            text-shadow: 2px 2px 0 #000;
+        }
+        #tourelle-battery-voltage {
+            font-size: 1.5rem;
+            vertical-align: middle;
+        }
+
+        /* Bouton TAUNT */
+        .taunt-btn {
+            width: 50px; height: 50px;
+            background-color: #F0C419;
+            border: 2px solid #fff;
+            border-radius: 6px;
+            font-size: 2rem;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            transition: transform 0.1s;
+        }
+        .taunt-btn:active { transform: scale(0.9); background-color: #d4ac0d; }
+
+        /* --- ZONE CENTRALE --- */
+        .middle-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 0 2rem 1rem 2rem;
+            pointer-events: none;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: auto;
+        }
+        
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .space-y-8 > * + * { margin-top: 2rem; }
+
+        .pan-buttons-row { display: flex; flex-direction: row; gap: 2rem; }
+        .tilt-buttons-col { display: flex; flex-direction: column; gap: 2rem; }
+
+        /* --- BOUTONS --- */
+        .control-button {
+            width: 12rem; height: 12rem;
+            border-radius: 50%;
+            font-size: 4rem;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+            border: 4px solid #f6e05e;
+            background-color: #4C72B0;
+            color: white;
+            user-select: none;
+            transition: transform 0.1s, background-color 0.2s;
+            cursor: pointer;
+        }
+        .control-button:active { transform: scale(0.95); background-color: #3b5998; }
+        
+        .control-button.red {
+            background-color: #BA2227;
+            border: none;
+            font-size: 1.5rem;
+            width: auto; height: auto;
+            border-radius: 0.5rem;
+            padding: 1rem 2rem;
+        }
+
+        /* --- FOOTER --- */
+        .footer-log {
+            padding: 0.5rem;
+            background-color: rgba(0, 0, 0, 0.7);
+            font-size: 1rem;
+            border-top: 2px solid #F0C419;
+            width: 100%;
+        }
+
+        /* --- ALERTES --- */
+        #low-battery-overlay, #low-ammo-overlay {
+            position: absolute; left: 50%; pointer-events: none; z-index: 50; display: none;
+            font-weight: bold; animation: pulse 0.5s infinite alternate;
+        }
+        #low-battery-overlay {
+            top: 50%; transform: translate(-50%, -50%);
+            color: #BA2227; font-size: 6rem; text-shadow: 0 0 15px rgba(255, 0, 0, 0.9);
+        }
+        #low-ammo-overlay {
+            top: 120px; transform: translate(-50%, 0);
+            color: #F0C419; font-size: 4rem; text-shadow: 0 0 15px rgba(240, 196, 25, 0.9);
+        }
+        @keyframes pulse { from { opacity: 0.9; } to { opacity: 1.0; } }
+        
+        .hidden { display: none !important; }
+        #confirmation-modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.75);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 60;
+        }
+        .modal-content {
+            background-color: #1f2937; padding: 2rem;
+            border-radius: 0.5rem; border: 2px solid #F0C419;
+            max-width: 30rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="video-feed-container">
+        <img id="video-stream" 
+             src="https://placehold.co/1920x1080/000/FFF?text=" 
+             onerror="this.src='https://placehold.co/1920x1080/A00/FFF?text=FLUX+VID%C3%89O+HORS+LIGNE'"
+             alt="Flux vidéo">
+    </div>
+    
+    <div id="low-battery-overlay" class="tf2-font">BATTERIE FAIBLE!</div>
+    <div id="low-ammo-overlay" class="tf2-font">MUNITIONS FAIBLES!</div>
+
+    <div id="controls-overlay">
+        
+        <div class="header-bar tf2-font">
+            <div class="w-1-3" style="display: flex; align-items: center;">
+                <span style="font-size: 1.2em; margin-right: 10px;">🟢</span> 
+                <span style="margin-right: 10px;">MUNITIONS:</span> 
+                <span id="munitions-level" class="text-green-400">OK</span>
+            </div>
+            
+            <div>
+                <button id="quit-button" class="control-button red">Quitter</button>
+            </div>
+            
+            <div class="w-1-3 header-right-container">
+                <div class="text-right">
+                    <div style="font-size: 0.6em; margin-bottom: -5px;">CONNEXION: <span id="status-connexion" class="text-red-500">HORS LIGNE</span></div>
+                    <div>
+                        <span id="batterie-tourelle-icon" class="battery-icon" style="font-size: 2rem;">🔌</span>
+                        <span id="tourelle-battery-percent" class="text-red-500">--%</span> 
+                        <span id="tourelle-battery-voltage" style="opacity: 0.8;">(--V)</span>
+                    </div>
+                </div>
+                <button id="taunt-button" class="taunt-btn" title="Taunt">📢</button>
+            </div>
+        </div>
+
+        <div class="middle-section">
+            <div class="control-group space-y-4">
+                <h2 class="tf2-font text-yellow-300" style="font-size: 2.5rem; text-shadow: 3px 3px 0 #000;">PAN</h2>
+                <div class="pan-buttons-row">
+                    <button id="pan-left" data-command="PAN_LEFT" class="control-button">&#9664;</button>
+                    <button id="pan-right" data-command="PAN_RIGHT" class="control-button">&#9654;</button>
+                </div>
+            </div>
+
+            <div class="control-group space-y-8">
+                <h2 class="tf2-font text-yellow-300" style="font-size: 2.5rem; text-shadow: 3px 3px 0 #000;">TILT</h2>
+                <div class="tilt-buttons-col">
+                    <button id="tilt-up" data-command="TILT_UP" class="control-button">&#9650;</button>
+                    <button id="tilt-down" data-command="TILT_DOWN" class="control-button">&#9660;</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-log tf2-outline">
+            <p id="debug-log">Log de Commande: Prêt.</p>
+        </div>
+    </div>
+
+    <div id="confirmation-modal" class="hidden">
+        <div class="modal-content">
+            <h3 class="tf2-font text-yellow-300" style="font-size: 2rem; margin-bottom: 1rem;">CONFIRMATION</h3>
+            <p style="margin-bottom: 1.5rem; font-size: 1.2rem;">Quitter l'interface ?</p>
+            <div style="display: flex; justify-content: space-between;">
+                <button id="modal-cancel" class="control-button red" style="background-color: #4C72B0;">Annuler</button>
+                <button id="modal-confirm" class="control-button red">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const LOCAL_MANETTE_IP = '127.0.0.1';
+        const LOCAL_MANETTE_PORT = 5001;
+        const LOCAL_API_ENDPOINT = `http://${LOCAL_MANETTE_IP}:${LOCAL_MANETTE_PORT}/api/command`; 
+        const KILL_API_ENDPOINT = `http://${LOCAL_MANETTE_IP}:${LOCAL_MANETTE_PORT}/api/kiosk_kill`;
+        const STATUS_ENDPOINT = `http://${LOCAL_MANETTE_IP}:${LOCAL_MANETTE_PORT}/api/status/tourelle`;
+        const NOTIFICATION_API_ENDPOINT = `http://${LOCAL_MANETTE_IP}:${LOCAL_MANETTE_PORT}/api/play_notification`;
+        
+        const COMMAND_INTERVAL = 50; 
+        const STATUS_UPDATE_INTERVAL = 2000; 
+        const LOW_BATTERY_THRESHOLD = 30; 
+        const AMMO_LOW_THRESHOLD = "AMMO_LOW"; 
+        const ALERT_DISPLAY_TIME = 5000; 
+        const ALERT_CYCLE_TIME = 20000; 
+
+        let commandIntervalId = null;
+        let lowBatteryIntervalId = null;
+        let lowAmmoIntervalId = null;
+        let currentBatteryPercent = 100;
+        let currentAmmoStatus = "OK";
+
+        const sendCommand = async (action) => {
+            const debugLog = document.getElementById('debug-log');
+            try {
+                const response = await fetch(LOCAL_API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: action })
+                });
+                const result = await response.json();
+                debugLog.textContent = `Log: ${action} > OK.`;
+                return response.ok;
+            } catch (error) {
+                debugLog.textContent = `Erreur: Serveur local non joignable.`;
+                return false;
+            }
+        };
+        
+        const playNotificationSound = async () => {
+            try { await fetch(NOTIFICATION_API_ENDPOINT, { method: 'POST' }); } catch (e) {}
+        };
+
+        const handleContinuousCommand = (command) => {
+            if (commandIntervalId) clearInterval(commandIntervalId);
+            sendCommand(command);
+            commandIntervalId = setInterval(() => { sendCommand(command); }, COMMAND_INTERVAL);
+        };
+
+        const handleStopCommand = (event) => {
+            if (commandIntervalId) {
+                clearInterval(commandIntervalId);
+                commandIntervalId = null;
+            }
+            const targetButton = event.currentTarget;
+            const command = targetButton.getAttribute('data-command');
+            if (!command) return; 
+            const stopCommand = command.replace(/(PAN|TILT|FIRE)_(LEFT|RIGHT|UP|DOWN|START)/, '$1_STOP');
+            sendCommand(stopCommand);
+        };
+        
+        const convertVoltageToPercent = (voltage) => {
+            const V_FULL = 12.6; const V_EMPTY = 10.5; 
+            if (voltage >= V_FULL) return 100;
+            if (voltage <= V_EMPTY) return 0;
+            const percent = ((voltage - V_EMPTY) / (V_FULL - V_EMPTY)) * 100;
+            return Math.min(100, Math.round(percent));
+        };
+
+        const updateConnectionIndicators = (is_connected) => {
+            const statusConnexionSpan = document.getElementById('status-connexion');
+            const tourelleBatteryPercent = document.getElementById('tourelle-battery-percent');
+            const tourelleBatteryVoltage = document.getElementById('tourelle-battery-voltage');
+            const munitionsLevel = document.getElementById('munitions-level');
+            const lowBatteryOverlay = document.getElementById('low-battery-overlay');
+            const lowAmmoOverlay = document.getElementById('low-ammo-overlay');
+
+            if (is_connected) {
+                statusConnexionSpan.textContent = "OK";
+                statusConnexionSpan.className = "text-green-400";
+            } else {
+                statusConnexionSpan.textContent = "HS";
+                statusConnexionSpan.className = "text-red-500";
+                tourelleBatteryPercent.textContent = "--%";
+                tourelleBatteryVoltage.textContent = "";
+                munitionsLevel.textContent = "---";
+                
+                lowBatteryOverlay.style.display = 'none';
+                lowAmmoOverlay.style.display = 'none';
+                if (lowBatteryIntervalId) { clearInterval(lowBatteryIntervalId); lowBatteryIntervalId = null; }
+                if (lowAmmoIntervalId) { clearInterval(lowAmmoIntervalId); lowAmmoIntervalId = null; }
+            }
+        };
+
+        const manageLowBatteryWarning = () => {
+            const overlay = document.getElementById('low-battery-overlay');
+            if (currentBatteryPercent < LOW_BATTERY_THRESHOLD) {
+                if (!lowBatteryIntervalId) {
+                    overlay.style.display = 'block';
+                    playNotificationSound(); 
+                    setTimeout(() => { overlay.style.display = 'none'; }, ALERT_DISPLAY_TIME);
+
+                    lowBatteryIntervalId = setInterval(() => {
+                        overlay.style.display = 'block';
+                        playNotificationSound();
+                        setTimeout(() => { overlay.style.display = 'none'; }, ALERT_DISPLAY_TIME);
+                    }, ALERT_CYCLE_TIME);
+                }
+            } else {
+                overlay.style.display = 'none';
+                if (lowBatteryIntervalId) { clearInterval(lowBatteryIntervalId); lowBatteryIntervalId = null; }
+            }
+        }
+        
+        const manageLowAmmoWarning = () => {
+            const overlay = document.getElementById('low-ammo-overlay');
+            if (currentAmmoStatus === AMMO_LOW_THRESHOLD) {
+                if (!lowAmmoIntervalId) {
+                    overlay.style.display = 'block';
+                    playNotificationSound();
+                    setTimeout(() => { overlay.style.display = 'none'; }, ALERT_DISPLAY_TIME);
+
+                    lowAmmoIntervalId = setInterval(() => {
+                        overlay.style.display = 'block';
+                        playNotificationSound();
+                        setTimeout(() => { overlay.style.display = 'none'; }, ALERT_DISPLAY_TIME);
+                    }, ALERT_CYCLE_TIME);
+                }
+            } else {
+                overlay.style.display = 'none';
+                if (lowAmmoIntervalId) { clearInterval(lowAmmoIntervalId); lowAmmoIntervalId = null; }
+            }
+        }
+        
+        const updateTourelleStatus = async () => {
+            try {
+                const response = await fetch(STATUS_ENDPOINT, { timeout: 1500 });
+                if (response.status === 503) { updateConnectionIndicators(false); return; }
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                updateConnectionIndicators(true);
+                const statusData = await response.json();
+                
+                currentAmmoStatus = statusData.ammo_status;
+                currentBatteryPercent = convertVoltageToPercent(statusData.voltage);
+                
+                const batElem = document.getElementById('tourelle-battery-percent');
+                batElem.textContent = `${currentBatteryPercent}%`;
+                document.getElementById('tourelle-battery-voltage').textContent = `(${statusData.voltage.toFixed(1)}V)`;
+                
+                batElem.className = currentBatteryPercent < 20 ? "text-red-500" : (currentBatteryPercent < 50 ? "text-yellow-300" : "text-green-400");
+
+                const ammoElem = document.getElementById('munitions-level');
+                if (currentAmmoStatus === "AMMO_LOW") {
+                    ammoElem.textContent = "VIDE";
+                    ammoElem.className = "text-red-500";
+                } else {
+                    ammoElem.textContent = "OK";
+                    ammoElem.className = "text-green-400";
+                }
+
+                manageLowBatteryWarning();
+                manageLowAmmoWarning();
+
+            } catch (error) {
+                updateConnectionIndicators(false);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const quitButton = document.getElementById('quit-button');
+            const tauntButton = document.getElementById('taunt-button');
+            const modal = document.getElementById('confirmation-modal');
+            const modalConfirm = document.getElementById('modal-confirm');
+            const modalCancel = document.getElementById('modal-cancel');
+
+            quitButton.addEventListener('click', () => modal.classList.remove('hidden'));
+            modalCancel.addEventListener('click', () => modal.classList.add('hidden'));
+            modalConfirm.addEventListener('click', async () => {
+                modal.classList.add('hidden');
+                await fetch(KILL_API_ENDPOINT, { method: 'POST' });
+            });
+
+            tauntButton.addEventListener('click', () => {
+                sendCommand('TAUNT');
+            });
+
+            document.querySelectorAll('.control-button').forEach(button => {
+                const command = button.getAttribute('data-command');
+                if (command && (command.startsWith('PAN_') || command.startsWith('TILT_'))) {
+                    button.addEventListener('mousedown', () => handleContinuousCommand(command));
+                    button.addEventListener('touchstart', (e) => { e.preventDefault(); handleContinuousCommand(command); });
+                    button.addEventListener('mouseup', handleStopCommand);
+                    button.addEventListener('touchend', handleStopCommand);
+                    button.addEventListener('mouseleave', handleStopCommand); 
+                }
+            });
+            
+            updateTourelleStatus(); 
+            setInterval(updateTourelleStatus, STATUS_UPDATE_INTERVAL); 
+        });
+    </script>
+</body>
+</html>
