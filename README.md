@@ -1,2 +1,2 @@
 # Tourelle_TF2
-Projet de création d'une tourelle airsoft
+Projet de création d'une tourelle airsoft téléguidée
