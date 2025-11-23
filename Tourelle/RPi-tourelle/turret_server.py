@@ -17,6 +17,7 @@ S_BUILDUP = "sentry_buildup.wav" # 10s
 S_IDLE    = "sentry_idle.wav"    # 3s
 S_SAP     = "sentry_sap.wav"     # 12s (Boucle)
 S_SPOT    = "sentry_spot.wav"    # <1s (Une fois)
+S_TAUNT   = "tf_domination.wav"  # Meilleurs Amis ! (Une fois par pression)
 
 app = Flask(__name__)
 
@@ -28,6 +29,10 @@ class AudioManager:
         
         # Jouer le son de construction au démarrage du script
         self.play_one_shot(S_BUILDUP)
+
+    def play_taunt(self):
+        """ Joue le son de troll """
+        self.play_one_shot(S_TAUNT)
 
     def play_one_shot(self, filename):
         """ Feu et oublie """
@@ -157,6 +162,8 @@ def handle_command():
     elif action == "TILT_UP":   turret.send_command("T:U")
     elif action == "TILT_DOWN": turret.send_command("T:D")
     elif action == "TILT_STOP": turret.send_command("T:S")
+    elif action == "TAUNT":
+        audio.play_one_shot(S_TAUNT)
 
     return jsonify({"status": "ok"}), 200
 
